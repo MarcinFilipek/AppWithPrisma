@@ -1,11 +1,15 @@
+import { InferGetStaticPropsType } from "next";
 import { prisma } from "../../server/db/client";
-import { Product } from "./types";
 
-type Props = {
-  products: Product[];
-};
+export async function getStaticProps() {
+  const products = await prisma.product.findMany();
 
-function Products({ products }: Props) {
+  return { props: { products } };
+}
+
+function Products({
+  products,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <ul>
       {products.map((product) => (
@@ -13,12 +17,6 @@ function Products({ products }: Props) {
       ))}
     </ul>
   );
-}
-
-export async function getServerSideProps() {
-  const products = await prisma.product.findMany();
-
-  return { props: { products } };
 }
 
 export default Products;
